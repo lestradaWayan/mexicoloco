@@ -10,7 +10,7 @@ const LanguageSelector = () => {
     useEffect(() => {
         gsap.to('.langSelector span', {
             lineHeight: 1.25,
-            duration: 1,
+            duration: 0.75,
             ease: 'power3.out',
             delay: 0.5
         });
@@ -18,7 +18,7 @@ const LanguageSelector = () => {
         gsap.to('.langSelector a span', {
             opacity: 1,
             y: '0%',
-            duration: 1,
+            duration: 0.75,
             stagger: 0.125,
             ease: 'power3.out',
             delay: 1
@@ -26,7 +26,7 @@ const LanguageSelector = () => {
     }, []);
 
     return (
-        <div className="langSelector flex items-center text-black text-lg divide-x divide-black divide-solid relative z-[101]">
+        <div className="langSelector flex items-center text-black text-lg divide-x divide-black divide-solid relative z-[101] big-shoulders-font">
             {Object.keys(AVAILABLE_LENGUAGES).map((lang, index) => (
                 <a
                     href={`/${

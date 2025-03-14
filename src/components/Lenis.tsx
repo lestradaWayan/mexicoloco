@@ -1,4 +1,6 @@
+import gsap from 'gsap';
 import { ReactLenis, useLenis } from 'lenis/react';
+import { useEffect } from 'react';
 
 const Lenis = ({
     children

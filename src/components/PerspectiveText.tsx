@@ -14,10 +14,10 @@ const PerspectiveText = ({
     SecondLabelClassName?: ClassValue;
 }) => {
     return (
-        <div className="perspectiveText">
-            <p className={cn(firstLabelClassName)}>{label}</p>
-            <p className={cn(SecondLabelClassName)}>{label}</p>
-        </div>
+        <span className="block perspectiveText">
+            <span className={cn(firstLabelClassName)}>{label}</span>
+            <span className={cn(SecondLabelClassName)}>{label}</span>
+        </span>
     );
 };
 
