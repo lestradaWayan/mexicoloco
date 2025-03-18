@@ -5,20 +5,17 @@ import { cn } from '../utils';
 const WordDividedText = ({
     string,
     className,
-    wrapper
+    wrapper,
+    selector
 }: {
     string: string;
     className?: ClassValue;
     wrapper?: ReactNode;
+    selector?: string;
 }) => {
     return string.split(' ').map((word, index) => {
         const content = (
-            <span
-                className={cn('wordInDividedText', className)}
-                key={`${word}-in-divided-text-${index}`}
-            >
-                {word}
-            </span>
+            <span className={cn('wordInDividedText', className)}>{word}</span>
         );
 
         // Si hay un wrapper, lo usamos para envolver el span
@@ -26,8 +23,10 @@ const WordDividedText = ({
             return (
                 <Fragment key={`${word}-in-divided-text-${index}`}>
                     {React.cloneElement(
-                        wrapper as React.ReactElement,
-                        {},
+                        wrapper as React.ReactElement<any>,
+                        {
+                            className: `wrapperForTextAnimation wordInDividedTextWrapper ${selector}`
+                        },
                         content
                     )}
                 </Fragment>
@@ -35,7 +34,14 @@ const WordDividedText = ({
         }
 
         // Si no hay un wrapper, retornamos solo el span
-        return content;
+        return (
+            <p
+                className={`wrapperForTextAnimation wordInDividedTextWrapper ${selector}`}
+                key={`${word}-in-divided-text-${index}`}
+            >
+                {content}
+            </p>
+        );
     });
 };
 

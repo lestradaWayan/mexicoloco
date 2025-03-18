@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 
 const usePathname = () => {
-    const [pathname, setPathname] = useState(window.location.pathname);
+    const [pathname, setPathname] = useState<string | undefined>();
+
+    useEffect(() => {
+        setPathname(() => window.location.pathname);
+    }, []);
 
     useEffect(() => {
         const handleRouteChange = () => setPathname(window.location.pathname);

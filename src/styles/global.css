@@ -26,7 +26,7 @@ body:has(.navigationOpen) {
 
 .navigation > a > p,
 .langSelector a,
-p.textAnimation {
+div.textAnimation .wrapperForTextAnimation {
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
 }
 
@@ -38,10 +38,9 @@ p.textAnimation {
 
 .navigation > a > p > span,
 .langSelector span,
-p.textAnimation > span {
+div.textAnimation .wrapperForTextAnimation > span {
     position: relative;
     display: block;
-    /* overflow: hidden; */
     transform: translateY(100%);
     will-change: transform;
 }
@@ -107,4 +106,26 @@ p.textAnimation > span {
 .heroImgContainer {
     clip-path: inset(0% 0% 100% 0%);
     will-change: 'clip-path';
+}
+
+/* .siteFadeIn {
+    animation: siteFadeIn 1s cubic-bezier(0.076, 0, 0.24, 1) forwards;
+}
+
+@keyframes siteFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+} */
+
+.heroParallaxText .parallaxTextItemContainer {
+    transform: translateX(-150%);
+}
+
+.heroParallaxText .parallaxTextItemContainerAlt {
+    transform: translateX(150%);
 }

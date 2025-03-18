@@ -1,4 +1,4 @@
-export const AVAILABLE_LENGUAGES = Object.freeze<{
+export const AVAILABLE_LANGUAGES = Object.freeze<{
     EN: string;
     ES: string;
 }>({
@@ -6,7 +6,7 @@ export const AVAILABLE_LENGUAGES = Object.freeze<{
     ES: 'es'
 });
 
-export const MENU_LINKS = Object.freeze<{label: string, path: string}[]>([
+export const MENU_LINKS = Object.freeze<{ label: string; path: string }[]>([
     {
         label: 'ABOUT',
         path: '#about'
@@ -23,4 +23,4 @@ export const MENU_LINKS = Object.freeze<{label: string, path: string}[]>([
         label: 'LOCATION',
         path: '#location'
     }
-])
+]);

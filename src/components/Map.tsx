@@ -6,18 +6,14 @@ const Map = () => {
     return (
         <div className="h-[200vh]">
             <TextAnimation
-                classSelector="textAnimation"
                 animationOptions={{
                     stagger: 0.125
                 }}
-                className="spicy-font text-black text-[clamp(2rem,6vw,7.5rem)] mx-auto max-w-fit mb-6 flex-wrap justify-center"
+                className="spicy-font text-black text-[clamp(2rem,6vw,7.5rem)] mx-auto max-w-fit flex-wrap justify-center"
             >
                 <WordDividedText
-                    string="ESTO ES EL MAPAP"
+                    string="ESTO ES EL MAPA"
                     className="leading-none uppercase"
-                    wrapper={
-                        <p className="wordInDividedTextWrapper textAnimation"></p>
-                    }
                 />
             </TextAnimation>
         </div>

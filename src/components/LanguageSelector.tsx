@@ -1,11 +1,13 @@
 import React, { useEffect } from 'react';
 import usePathname from '../hooks/usePathname';
-import { AVAILABLE_LENGUAGES } from '../constants';
+import { AVAILABLE_LANGUAGES } from '../constants';
 import { cn } from '../utils';
 import gsap from 'gsap';
+import useLanguage from '../hooks/useLanguage';
 
 const LanguageSelector = () => {
     const pathname = usePathname();
+    const { language, dictionary } = useLanguage();
 
     useEffect(() => {
         gsap.to('.langSelector span', {
@@ -27,20 +29,19 @@ const LanguageSelector = () => {
 
     return (
         <div className="langSelector flex items-center text-black text-lg divide-x divide-black divide-solid relative z-[101] big-shoulders-font">
-            {Object.keys(AVAILABLE_LENGUAGES).map((lang, index) => (
+            {Object.keys(AVAILABLE_LANGUAGES).map((lang, index) => (
                 <a
                     href={`/${
-                        (lang as keyof typeof AVAILABLE_LENGUAGES) === 'EN'
+                        (lang as keyof typeof AVAILABLE_LANGUAGES) === 'EN'
                             ? ''
                             : lang.toLowerCase()
                     }`}
                     key={`lang-${index}`}
                     className={cn(
-                        ' first-of-type:pr-3 last-of-type:pl-3 select-none max-h-fit',
+                        'cursor-pointer first-of-type:pr-3 last-of-type:pl-3 select-none max-h-fit',
                         {
                             '!text-black/40 pointer-events-none':
-                                lang.toLowerCase() ===
-                                    pathname.replace('/', '') ||
+                                lang === language ||
                                 (lang === 'EN' && pathname === '/')
                         }
                     )}

@@ -5,9 +5,12 @@ import { useEffect, useRef } from 'react';
 import Container from './Container';
 import TextAnimation from './TextAnimation';
 import ParallaxText from './ParallaxText';
+import useLanguage from '../hooks/useLanguage';
 
 const Hero = () => {
     const container = useRef(null);
+
+    const { dictionary } = useLanguage();
 
     const { scrollYProgress } = useScroll({
         target: container,
@@ -42,43 +45,111 @@ const Hero = () => {
     }, []);
 
     return (
-        <motion.div ref={container} className="pt-[max(10rem,15svh)] h-[200vh]">
-            <motion.div
-                style={{
-                    scale
-                }}
-            >
-                <Container>
-                    <ParallaxText
-                        className="gap-4"
-                        progress={useTransform(
-                            scrollYProgress,
-                            [0, 0.5],
-                            ['0%', '100%']
-                        )}
+        <motion.div
+            ref={container}
+            className="pt-[max(12.5rem,25svh)] h-[200vh]"
+        >
+            <Container>
+                {/* PARALLAX TEXT UPPER */}
+                <ParallaxText
+                    className="gap-4 heroParallaxText"
+                    progress={useTransform(
+                        scrollYProgress,
+                        [0, 0.5],
+                        ['0%', '100%']
+                    )}
+                    wrapper={
+                        <motion.div className="parallaxTextItemContainer" />
+                    }
+                >
+                    <TextAnimation
+                        customAnimation={(elements) => {
+                            const tl = gsap.timeline();
+
+                            // Animar simultáneamente los elementos verticales y horizontales
+                            tl.to(
+                                elements,
+                                {
+                                    y: '0%',
+                                    duration: 0.75,
+                                    stagger: 0.125,
+                                    ease: 'power3.out'
+                                },
+                                1
+                            ).to(
+                                '.heroParallaxText .parallaxTextItemContainer',
+                                {
+                                    translateX: '0%',
+                                    duration: 2.25,
+                                    ease: 'power3.out'
+                                },
+                                1
+                            );
+                        }}
+                        className="spicy-font text-rose-500 text-[clamp(2.75rem,10vw,10rem)] justify-center"
+                        disableRepetition
+                        disableViewDetection
                     >
-                        <TextAnimation
-                            classSelector="textAnimation"
-                            animationOptions={{
-                                stagger: 0.125,
-                                delay: 1,
-                                repetitionDelay: 0.25
-                            }}
-                            className="spicy-font text-rose-500 text-[clamp(2rem,6vw,7.5rem)] mx-auto max-w-fit mb-6 flex-wrap justify-center"
-                            disableRepetition
-                            disableViewDetection
-                        >
-                            <WordDividedText
-                                string="Picardia pura para comer y beber"
-                                className="leading-none uppercase"
-                                wrapper={
-                                    <p className="wordInDividedTextWrapper textAnimation"></p>
-                                }
-                            />
-                        </TextAnimation>
-                    </ParallaxText>
-                </Container>
-            </motion.div>
+                        <WordDividedText
+                            string={dictionary.hero.title
+                                .split(' ')
+                                .slice(0, 2)
+                                .join(' ')}
+                            className="leading-none uppercase"
+                        />
+                    </TextAnimation>
+                </ParallaxText>
+                {/* PARALLAX TEXT LOWER */}
+                <ParallaxText
+                    className="gap-4 heroParallaxText"
+                    progress={useTransform(
+                        scrollYProgress,
+                        [0, 0.5],
+                        ['0%', '-100%']
+                    )}
+                    wrapper={
+                        <motion.div className="parallaxTextItemContainerAlt" />
+                    }
+                >
+                    <TextAnimation
+                        classSelector=""
+                        customAnimation={(elements) => {
+                            const tl = gsap.timeline();
+
+                            // Animar simultáneamente los elementos verticales y horizontales
+                            tl.to(
+                                elements,
+                                {
+                                    y: '0%',
+                                    duration: 0.75,
+                                    stagger: 0.125,
+                                    ease: 'power3.out'
+                                },
+                                1
+                            ).to(
+                                '.heroParallaxText .parallaxTextItemContainerAlt',
+                                {
+                                    translateX: '0%',
+                                    duration: 2.25,
+                                    ease: 'power3.out'
+                                },
+                                1
+                            );
+                        }}
+                        className="spicy-font text-rose-500 text-[clamp(2.75rem,10vw,10rem)] mb-2 justify-center"
+                        disableRepetition
+                        disableViewDetection
+                    >
+                        <WordDividedText
+                            string={dictionary.hero.title
+                                .split(' ')
+                                .slice(2)
+                                .join(' ')}
+                            className="leading-none uppercase"
+                        />
+                    </TextAnimation>
+                </ParallaxText>
+            </Container>
             <div className="sticky top-0 heroImgContainer overflow-hidden">
                 <motion.img
                     src="/hero_img.webp"

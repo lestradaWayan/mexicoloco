@@ -10,19 +10,25 @@ const TextAnimation = ({
     disableRepetition = false,
     disableViewDetection = false,
     className,
+    customAnimation,
     ...props
 }: {
-    classSelector: string;
+    classSelector?: string;
     animationOptions?: gsap.TweenVars & {
         repetitionDelay?: number;
     };
     disableRepetition?: boolean;
     disableViewDetection?: boolean;
+    customAnimation?: (
+        elements: NodeListOf<Element>,
+        timeline?: gsap.core.Timeline
+    ) => void;
 } & HTMLMotionProps<'div'>) => {
     const element = useRef<HTMLDivElement>(null);
     const animationRef = useRef<gsap.core.Tween | null>(null);
     const previousStateRef = useRef<boolean | null>(null);
     const firstAnimationCompleted = useRef<boolean>(false);
+    const animationInProgress = useRef<boolean>(false);
 
     // Obtener el estado de visibilidad del elemento
     const isVisible = useInView(element);
@@ -30,78 +36,88 @@ const TextAnimation = ({
     useEffect(() => {
         if (!element.current) return;
 
-        if (disableViewDetection) {
-            // Limpiar cualquier animación anterior
-            if (animationRef.current) {
-                animationRef.current.kill();
-            }
-
-            // Importante: Seleccionar elementos solo dentro de esta instancia específica
-            const targetElements = element.current.querySelectorAll(
-                `.${classSelector} > span`
-            );
-
-            if (targetElements.length === 0) return;
-
-            const animOptions = {
-                y: '0%',
-                duration: 0.75,
-                ease: 'power3.out',
-                ...animationOptions
-            };
-
-            animationRef.current = gsap.to(targetElements, animOptions);
-
-            // Marcar que la primera animación se ha completado
-            firstAnimationCompleted.current = true;
-        } else {
-            if (isVisible && previousStateRef.current !== isVisible) {
-                // Limpiar cualquier animación anterior
-                if (animationRef.current) {
-                    animationRef.current.kill();
-                }
-
-                // Importante: Seleccionar elementos solo dentro de esta instancia específica
-                const targetElements = element.current.querySelectorAll(
-                    `.${classSelector} > span`
-                );
-
-                if (targetElements.length === 0) return;
-
-                // Asegurarse que los elementos empiezan en su posición inicial
-                if (!disableRepetition) {
-                    gsap.set(targetElements, {
-                        y: '100%'
-                    });
-                }
-
-                // Crear opciones de animación
-                const animOptions = {
-                    y: '0%',
-                    duration: 0.75,
-                    ease: 'power3.out',
-                    ...animationOptions
-                };
-
-                // Si no es la primera ejecución, eliminar cualquier delay
-                if (firstAnimationCompleted.current) {
-                    animOptions.delay = animationOptions?.repetitionDelay || 0;
-                } else {
-                }
-
-                // Crear la nueva animación usando los elementos específicos de esta instancia
-                animationRef.current = gsap.to(targetElements, animOptions);
-
-                // Marcar que la primera animación se ha completado
-                firstAnimationCompleted.current = true;
-            }
-
-            // Actualizar el estado anterior
-            previousStateRef.current = isVisible;
+        // Limpiar cualquier animación anterior
+        if (animationRef.current && !animationInProgress.current) {
+            animationRef.current.kill();
         }
 
-        // Solo ejecutar la animación cuando el elemento se vuelve visible
-        // y no estaba visible antes (o es la primera vez)
+        // Seleccionar elementos solo dentro de esta instancia específica
+        const targetElements = element.current.querySelectorAll(
+            `.textAnimation ${
+                classSelector
+                    ? `.wrapperForTextAnimation.${classSelector}`
+                    : '.wrapperForTextAnimation'
+            } > span`
+        );
+
+        if (targetElements.length === 0) return;
+
+        // Determinar si debemos animar basado en visibilidad
+        const shouldAnimate =
+            disableViewDetection ||
+            (isVisible && previousStateRef.current !== isVisible);
+
+        if (
+            (!isVisible &&
+                !disableViewDetection &&
+                previousStateRef.current !== isVisible &&
+                !disableRepetition) ||
+            (!isVisible &&
+                !disableViewDetection &&
+                previousStateRef.current !== isVisible &&
+                disableRepetition &&
+                !firstAnimationCompleted.current)
+        ) {
+            if (!animationInProgress.current || !disableRepetition) {
+                // Reiniciar la posición cuando el elemento sale de la vista
+                gsap.set(targetElements, { y: '100%' });
+            }
+            previousStateRef.current = isVisible;
+            return;
+        }
+
+        if (!shouldAnimate) {
+            previousStateRef.current = isVisible;
+            return;
+        }
+
+        // Si hay una animación personalizada, usarla
+        if (customAnimation) {
+            customAnimation(targetElements);
+            firstAnimationCompleted.current = true;
+            previousStateRef.current = isVisible;
+            return;
+        }
+
+        // Crear opciones de animación base
+        const animOptions = {
+            y: '0%',
+            duration: 0.75,
+            ease: 'power3.out',
+            ...animationOptions,
+            onStart: () => {
+                animationInProgress.current = true;
+            },
+            onComplete: () => {
+                animationInProgress.current = false;
+                firstAnimationCompleted.current = true;
+            }
+        };
+
+        // Ajustar el delay para repeticiones
+        if (
+            (!disableViewDetection && firstAnimationCompleted.current) ||
+            !disableRepetition
+        ) {
+            animOptions.delay = animationOptions?.repetitionDelay || 0;
+        }
+
+        // Crear la nueva animación solo si no es repetición y disableRepetition es true
+        if (!firstAnimationCompleted.current || !disableRepetition) {
+            animationRef.current = gsap.to(targetElements, animOptions);
+        }
+
+        previousStateRef.current = isVisible;
 
         // Limpieza al desmontar
         return () => {
@@ -109,10 +125,21 @@ const TextAnimation = ({
                 animationRef.current.kill();
             }
         };
-    }, [isVisible, classSelector, animationOptions]);
+    }, [
+        isVisible,
+        classSelector,
+        animationOptions,
+        customAnimation,
+        disableViewDetection,
+        disableRepetition
+    ]);
 
     return (
-        <motion.div className={cn(className)} ref={element} {...props}>
+        <motion.div
+            className={cn('textAnimation', className)}
+            ref={element}
+            {...props}
+        >
             {children}
         </motion.div>
     );

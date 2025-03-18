@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, type ReactNode } from 'react';
 import { cn } from '../utils';
 import type { MotionValue } from 'motion';
 import { motion, type HTMLMotionProps } from 'motion/react';
@@ -8,28 +8,19 @@ const ParallaxText = ({
     className,
     numberOfCopies,
     progress,
+    childProps,
+    wrapper,
     ...props
-}: React.DetailedHTMLProps<
-    React.HTMLAttributes<HTMLDivElement>,
-    HTMLDivElement
-> & {
+}: HTMLMotionProps<'div'> & {
     numberOfCopies?: number;
     progress: MotionValue<number> | MotionValue<string>;
+    childProps?: HTMLMotionProps<'div'>;
+    wrapper?: ReactNode;
 }) => {
-    const child = React.Children.only(
-        children
-    ) as React.ReactElement<HTMLDivElement>;
+    const child = React.Children.only(children) as React.ReactElement<
+        HTMLMotionProps<'div'>
+    >;
     const originalClassName = child.props.className || '';
-
-    useEffect(() => {
-        const unsuscribe = progress.on('change', (value) => {
-            console.log(value);
-        });
-
-        return () => {
-            unsuscribe();
-        };
-    }, [progress]);
 
     return (
         <motion.div
@@ -37,24 +28,30 @@ const ParallaxText = ({
                 'parallaxText flex items-center justify-center overflow-hidden',
                 className
             )}
+            {...props}
         >
             {Array.from({ length: numberOfCopies || 3 }).map((_, index) =>
                 React.cloneElement(
-                    children as React.ReactElement<HTMLMotionProps<'div'>>,
-                    {
-                        className: cn(
-                            'parallaxTextItem min-w-full',
-                            originalClassName,
-                            {
-                                'text-yellow-500': index === 0,
-                                'text-rose-500': index === 1,
-                                'text-blue-500': index === 2
+                    wrapper as React.ReactElement,
+                    { key: `parallaxText-item-${index}` },
+                    React.cloneElement(
+                        children as React.ReactElement<HTMLMotionProps<'div'>>,
+                        {
+                            className: cn(
+                                'parallaxTextItem',
+                                originalClassName,
+                                {
+                                    'text-yellow-500': index === 0,
+                                    'text-rose-500': index === 1,
+                                    'text-blue-500': index === 2
+                                }
+                            ),
+                            style: {
+                                translateX: progress,
+                                ...childProps?.style
                             }
-                        ),
-                        style: {
-                            translateX: progress
                         }
-                    }
+                    )
                 )
             )}
         </motion.div>
