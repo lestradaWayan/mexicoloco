@@ -10,6 +10,7 @@ const Map = () => {
                     stagger: 0.125
                 }}
                 className="spicy-font text-black text-[clamp(2rem,6vw,7.5rem)] mx-auto max-w-fit flex-wrap justify-center"
+                disableOnce
             >
                 <WordDividedText
                     string="ESTO ES EL MAPA"

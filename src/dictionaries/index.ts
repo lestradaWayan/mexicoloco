@@ -33,6 +33,10 @@ const ENGLISH_DICTIONARY = {
     },
     hero: {
         title: 'Pure mischief to eat and drink'
+    },
+    about: {
+        title: 'ABOUT US',
+        text: 'Mexico Loco is an authentic experience of Mexican food and atmosphere, feel welcome with our restaurant and relax with the music of the mariachi accompanied by one of our traditional dishes or drinks.'
     }
 };
 
@@ -46,6 +50,10 @@ export const DICTIONARY = {
         },
         hero: {
             title: 'Picardia pura para comer y beber'
+        },
+        about: {
+            title: 'SOBRE NOSOTROS',
+            text: 'México Loco es una experiencia autentica de comida y ambiente mexicanos, siéntete bienvenido con nuestro restaurante y relájate con la música del mariachi, acompañado con uno de nuestros platillos tradicionales o bebidas.'
         }
     }
 } satisfies DictionaryType<typeof ENGLISH_DICTIONARY>;

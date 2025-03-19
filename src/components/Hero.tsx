@@ -87,8 +87,7 @@ const Hero = () => {
                             );
                         }}
                         className="spicy-font text-rose-500 text-[clamp(2.75rem,10vw,10rem)] justify-center"
-                        disableRepetition
-                        disableViewDetection
+                        disableInView
                     >
                         <WordDividedText
                             string={dictionary.hero.title
@@ -137,8 +136,7 @@ const Hero = () => {
                             );
                         }}
                         className="spicy-font text-rose-500 text-[clamp(2.75rem,10vw,10rem)] mb-2 justify-center"
-                        disableRepetition
-                        disableViewDetection
+                        disableInView
                     >
                         <WordDividedText
                             string={dictionary.hero.title

@@ -8,6 +8,7 @@ import Gallery from '../components/Gallery';
 import Map from '../components/Map';
 import Footer from '../components/Footer';
 import Lenis from '../components/Lenis';
+import StickyEffect from '../components/StickyEffect';
 ---
 
 <Layout>
@@ -16,8 +17,7 @@ import Lenis from '../components/Lenis';
             <Lenis client:only>
                 <Header client:only />
                 <Hero client:only />
-                <About client:only />
-                <Menu />
+                <StickyEffect client:only />
                 <Gallery />
                 <Map client:only />
                 <Footer />

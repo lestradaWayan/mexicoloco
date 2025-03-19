@@ -1,47 +1,73 @@
 import gsap from 'gsap';
-import { motion, useInView, type HTMLMotionProps } from 'motion/react';
-import { useEffect, useRef } from 'react';
+import {
+    motion,
+    useInView,
+    type HTMLMotionProps,
+    type UseInViewOptions
+} from 'motion/react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '../utils';
+import visibleDirective from 'astro/runtime/client/visible.js';
 
 const TextAnimation = ({
     children,
     classSelector,
-    animationOptions,
-    disableRepetition = false,
-    disableViewDetection = false,
+    animationOptions = {},
+    disableInView = false,
+    disableOnce = false,
     className,
     customAnimation,
     ...props
 }: {
     classSelector?: string;
     animationOptions?: gsap.TweenVars & {
-        repetitionDelay?: number;
+        visibleMargin?: UseInViewOptions['margin'];
     };
-    disableRepetition?: boolean;
-    disableViewDetection?: boolean;
+    disableInView?: boolean;
+    disableOnce?: boolean;
     customAnimation?: (
         elements: NodeListOf<Element>,
         timeline?: gsap.core.Timeline
     ) => void;
 } & HTMLMotionProps<'div'>) => {
     const element = useRef<HTMLDivElement>(null);
-    const animationRef = useRef<gsap.core.Tween | null>(null);
-    const previousStateRef = useRef<boolean | null>(null);
-    const firstAnimationCompleted = useRef<boolean>(false);
-    const animationInProgress = useRef<boolean>(false);
+    const [isRunningAnimation, setRunningAnimation] = useState<boolean>(false);
+    const onceValue = useMemo(() => !disableOnce, [disableOnce]);
 
-    // Obtener el estado de visibilidad del elemento
-    const isVisible = useInView(element);
+    const isVisible = useInView(element, {
+        once: onceValue,
+        margin: animationOptions?.visibleMargin ?? '0%'
+    });
 
     useEffect(() => {
-        if (!element.current) return;
+        if (!element.current || isRunningAnimation) return;
 
-        // Limpiar cualquier animación anterior
-        if (animationRef.current && !animationInProgress.current) {
-            animationRef.current.kill();
+        function runAnimation(targetElements: NodeListOf<Element>) {
+            if (customAnimation) {
+                customAnimation(targetElements);
+                return;
+            }
+
+            gsap.fromTo(
+                targetElements,
+                {
+                    y: '100%'
+                },
+                {
+                    y: '0%',
+                    duration: 0.75,
+                    ease: 'power3.out',
+                    onStart: () => {
+                        setRunningAnimation(() => true);
+                    },
+                    onComplete: () => {
+                        setRunningAnimation(() => false);
+                    },
+                    ...animationOptions
+                }
+            );
         }
 
-        // Seleccionar elementos solo dentro de esta instancia específica
         const targetElements = element.current.querySelectorAll(
             `.textAnimation ${
                 classSelector
@@ -49,90 +75,17 @@ const TextAnimation = ({
                     : '.wrapperForTextAnimation'
             } > span`
         );
-
         if (targetElements.length === 0) return;
 
-        // Determinar si debemos animar basado en visibilidad
-        const shouldAnimate =
-            disableViewDetection ||
-            (isVisible && previousStateRef.current !== isVisible);
-
-        if (
-            (!isVisible &&
-                !disableViewDetection &&
-                previousStateRef.current !== isVisible &&
-                !disableRepetition) ||
-            (!isVisible &&
-                !disableViewDetection &&
-                previousStateRef.current !== isVisible &&
-                disableRepetition &&
-                !firstAnimationCompleted.current)
-        ) {
-            if (!animationInProgress.current || !disableRepetition) {
-                // Reiniciar la posición cuando el elemento sale de la vista
-                gsap.set(targetElements, { y: '100%' });
-            }
-            previousStateRef.current = isVisible;
+        if (disableInView) {
+            runAnimation(targetElements);
             return;
         }
 
-        if (!shouldAnimate) {
-            previousStateRef.current = isVisible;
-            return;
+        if (isVisible) {
+            runAnimation(targetElements);
         }
-
-        // Si hay una animación personalizada, usarla
-        if (customAnimation) {
-            customAnimation(targetElements);
-            firstAnimationCompleted.current = true;
-            previousStateRef.current = isVisible;
-            return;
-        }
-
-        // Crear opciones de animación base
-        const animOptions = {
-            y: '0%',
-            duration: 0.75,
-            ease: 'power3.out',
-            ...animationOptions,
-            onStart: () => {
-                animationInProgress.current = true;
-            },
-            onComplete: () => {
-                animationInProgress.current = false;
-                firstAnimationCompleted.current = true;
-            }
-        };
-
-        // Ajustar el delay para repeticiones
-        if (
-            (!disableViewDetection && firstAnimationCompleted.current) ||
-            !disableRepetition
-        ) {
-            animOptions.delay = animationOptions?.repetitionDelay || 0;
-        }
-
-        // Crear la nueva animación solo si no es repetición y disableRepetition es true
-        if (!firstAnimationCompleted.current || !disableRepetition) {
-            animationRef.current = gsap.to(targetElements, animOptions);
-        }
-
-        previousStateRef.current = isVisible;
-
-        // Limpieza al desmontar
-        return () => {
-            if (animationRef.current) {
-                animationRef.current.kill();
-            }
-        };
-    }, [
-        isVisible,
-        classSelector,
-        animationOptions,
-        customAnimation,
-        disableViewDetection,
-        disableRepetition
-    ]);
+    }, [isVisible]);
 
     return (
         <motion.div
