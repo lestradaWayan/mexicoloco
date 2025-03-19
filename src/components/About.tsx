@@ -13,13 +13,13 @@ import Word from './Word';
 import useLanguage from '../hooks/useLanguage';
 
 const About = ({ className, ...props }: HTMLMotionProps<'div'>) => {
-    const { dictionary } = useLanguage();
+    const { dictionary, language } = useLanguage();
 
     const container = useRef<any>(null);
 
     const { scrollYProgress } = useScroll({
         target: container,
-        offset: ['start 0.75', 'start 0']
+        offset: ['start 0.5', 'start 0.1']
     });
 
     return (
@@ -30,6 +30,7 @@ const About = ({ className, ...props }: HTMLMotionProps<'div'>) => {
         >
             <Container className="flex items-center flex-col justify-center">
                 <TextAnimation
+                    key={`about-title-${language}`}
                     animationOptions={{
                         stagger: 0.075
                     }}

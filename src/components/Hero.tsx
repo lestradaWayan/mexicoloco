@@ -10,7 +10,7 @@ import useLanguage from '../hooks/useLanguage';
 const Hero = () => {
     const container = useRef(null);
 
-    const { dictionary } = useLanguage();
+    const { dictionary, language } = useLanguage();
 
     const { scrollYProgress } = useScroll({
         target: container,
@@ -36,12 +36,12 @@ const Hero = () => {
     );
 
     useEffect(() => {
-        gsap.to('.heroImgContainer', {
-            clipPath: 'inset(0% 0% 0% 0%)',
-            duration: 1,
-            ease: 'power3.out',
-            delay: 1.25
-        });
+        // gsap.to('.heroImgContainer', {
+        //     clipPath: 'inset(0% 0% 0% 0%)',
+        //     duration: 1,
+        //     ease: 'power3.out',
+        //     delay: 1.25
+        // });
     }, []);
 
     return (
@@ -49,105 +49,108 @@ const Hero = () => {
             ref={container}
             className="pt-[max(12.5rem,25svh)] h-[200vh]"
         >
-            <Container>
-                {/* PARALLAX TEXT UPPER */}
-                <ParallaxText
-                    className="gap-4 heroParallaxText"
-                    progress={useTransform(
-                        scrollYProgress,
-                        [0, 0.5],
-                        ['0%', '100%']
-                    )}
-                    wrapper={
-                        <motion.div className="parallaxTextItemContainer" />
-                    }
-                >
-                    <TextAnimation
-                        customAnimation={(elements) => {
-                            const tl = gsap.timeline();
-
-                            // Animar simultáneamente los elementos verticales y horizontales
-                            tl.to(
-                                elements,
-                                {
-                                    y: '0%',
-                                    duration: 0.75,
-                                    stagger: 0.125,
-                                    ease: 'power3.out'
-                                },
-                                1
-                            ).to(
-                                '.heroParallaxText .parallaxTextItemContainer',
-                                {
-                                    translateX: '0%',
-                                    duration: 2.25,
-                                    ease: 'power3.out'
-                                },
-                                1
-                            );
-                        }}
-                        className="spicy-font text-rose-500 text-[clamp(2.75rem,10vw,10rem)] justify-center"
-                        disableInView
+            <div className="overflow-hidden">
+                <Container>
+                    {/* PARALLAX TEXT UPPER */}
+                    <ParallaxText
+                        className="gap-4 heroParallaxText"
+                        progress={useTransform(
+                            scrollYProgress,
+                            [0, 0.5],
+                            ['0%', '100%']
+                        )}
+                        wrapper={
+                            <motion.div className="parallaxTextItemContainer" />
+                        }
                     >
-                        <WordDividedText
-                            string={dictionary.hero.title
-                                .split(' ')
-                                .slice(0, 2)
-                                .join(' ')}
-                            className="leading-none uppercase"
-                        />
-                    </TextAnimation>
-                </ParallaxText>
-                {/* PARALLAX TEXT LOWER */}
-                <ParallaxText
-                    className="gap-4 heroParallaxText"
-                    progress={useTransform(
-                        scrollYProgress,
-                        [0, 0.5],
-                        ['0%', '-100%']
-                    )}
-                    wrapper={
-                        <motion.div className="parallaxTextItemContainerAlt" />
-                    }
-                >
-                    <TextAnimation
-                        classSelector=""
-                        customAnimation={(elements) => {
-                            const tl = gsap.timeline();
+                        <TextAnimation
+                            key={`hero-title-${language}`}
+                            customAnimation={(elements) => {
+                                const tl = gsap.timeline();
 
-                            // Animar simultáneamente los elementos verticales y horizontales
-                            tl.to(
-                                elements,
-                                {
-                                    y: '0%',
-                                    duration: 0.75,
-                                    stagger: 0.125,
-                                    ease: 'power3.out'
-                                },
-                                1
-                            ).to(
-                                '.heroParallaxText .parallaxTextItemContainerAlt',
-                                {
-                                    translateX: '0%',
-                                    duration: 2.25,
-                                    ease: 'power3.out'
-                                },
-                                1
-                            );
-                        }}
-                        className="spicy-font text-rose-500 text-[clamp(2.75rem,10vw,10rem)] mb-2 justify-center"
-                        disableInView
+                                // Animar simultáneamente los elementos verticales y horizontales
+                                tl.to(
+                                    elements,
+                                    {
+                                        y: '0%',
+                                        duration: 0.75,
+                                        stagger: 0.125,
+                                        ease: 'power3.out'
+                                    },
+                                    1
+                                ).to(
+                                    '.heroParallaxText .parallaxTextItemContainer',
+                                    {
+                                        translateX: '0%',
+                                        duration: 2.25,
+                                        ease: 'power3.out'
+                                    },
+                                    1
+                                );
+                            }}
+                            className="spicy-font text-rose-500 text-[clamp(2.75rem,10vw,10rem)] justify-center"
+                            disableInView
+                        >
+                            <WordDividedText
+                                string={dictionary.hero.title
+                                    .split(' ')
+                                    .slice(0, 2)
+                                    .join(' ')}
+                                className="leading-none uppercase"
+                            />
+                        </TextAnimation>
+                    </ParallaxText>
+                    {/* PARALLAX TEXT LOWER */}
+                    <ParallaxText
+                        className="gap-4 heroParallaxText"
+                        progress={useTransform(
+                            scrollYProgress,
+                            [0, 0.5],
+                            ['0%', '-100%']
+                        )}
+                        wrapper={
+                            <motion.div className="parallaxTextItemContainerAlt" />
+                        }
                     >
-                        <WordDividedText
-                            string={dictionary.hero.title
-                                .split(' ')
-                                .slice(2)
-                                .join(' ')}
-                            className="leading-none uppercase"
-                        />
-                    </TextAnimation>
-                </ParallaxText>
-            </Container>
+                        <TextAnimation
+                            key={`hero-title-${language}`}
+                            customAnimation={(elements) => {
+                                const tl = gsap.timeline();
+
+                                // Animar simultáneamente los elementos verticales y horizontales
+                                tl.to(
+                                    elements,
+                                    {
+                                        y: '0%',
+                                        duration: 0.75,
+                                        stagger: 0.125,
+                                        ease: 'power3.out'
+                                    },
+                                    1
+                                ).to(
+                                    '.heroParallaxText .parallaxTextItemContainerAlt',
+                                    {
+                                        translateX: '0%',
+                                        duration: 2.25,
+                                        ease: 'power3.out'
+                                    },
+                                    1
+                                );
+                            }}
+                            className="spicy-font text-rose-500 text-[clamp(2.75rem,10vw,10rem)] mb-2 justify-center"
+                            disableInView
+                        >
+                            <WordDividedText
+                                string={dictionary.hero.title
+                                    .split(' ')
+                                    .slice(2)
+                                    .join(' ')}
+                                className="leading-none uppercase"
+                            />
+                        </TextAnimation>
+                    </ParallaxText>
+                </Container>
+            </div>
             <div className="sticky top-0 heroImgContainer overflow-hidden">
                 <motion.img
                     src="/hero_img.webp"

@@ -8,6 +8,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '../utils';
 import visibleDirective from 'astro/runtime/client/visible.js';
+import useLanguage from '../hooks/useLanguage';
 
 const TextAnimation = ({
     children,
@@ -39,34 +40,32 @@ const TextAnimation = ({
         margin: animationOptions?.visibleMargin ?? '0%'
     });
 
+    const { language } = useLanguage();
+
+    function runAnimation(targetElements: NodeListOf<Element>) {
+        if (customAnimation) {
+            customAnimation(targetElements);
+            return;
+        }
+
+        gsap.set(targetElements, { y: '100%' });
+
+        gsap.to(targetElements, {
+            y: '0%',
+            duration: 0.75,
+            ease: 'power3.out',
+            onStart: () => {
+                setRunningAnimation(() => true);
+            },
+            onComplete: () => {
+                setRunningAnimation(() => false);
+            },
+            ...animationOptions
+        });
+    }
+
     useEffect(() => {
         if (!element.current || isRunningAnimation) return;
-
-        function runAnimation(targetElements: NodeListOf<Element>) {
-            if (customAnimation) {
-                customAnimation(targetElements);
-                return;
-            }
-
-            gsap.fromTo(
-                targetElements,
-                {
-                    y: '100%'
-                },
-                {
-                    y: '0%',
-                    duration: 0.75,
-                    ease: 'power3.out',
-                    onStart: () => {
-                        setRunningAnimation(() => true);
-                    },
-                    onComplete: () => {
-                        setRunningAnimation(() => false);
-                    },
-                    ...animationOptions
-                }
-            );
-        }
 
         const targetElements = element.current.querySelectorAll(
             `.textAnimation ${
@@ -75,6 +74,7 @@ const TextAnimation = ({
                     : '.wrapperForTextAnimation'
             } > span`
         );
+
         if (targetElements.length === 0) return;
 
         if (disableInView) {
@@ -82,10 +82,8 @@ const TextAnimation = ({
             return;
         }
 
-        if (isVisible) {
-            runAnimation(targetElements);
-        }
-    }, [isVisible]);
+        if (isVisible) runAnimation(targetElements);
+    }, [isVisible, language]);
 
     return (
         <motion.div
